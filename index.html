@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>星河生日仪表盘</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --blue: #1d5cff;
+      --rose: #ffc1dc;
+      --text: #eef5ff;
+      --muted: #aebde4;
+      --line: rgba(189, 208, 255, 0.22);
+      --font-title: "Didot", "Bodoni 72", "Playfair Display", Georgia, serif;
+      --font-body: "Avenir Next", Avenir, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-cn: "LiSu", "隶书", "STLiti", "Kaiti SC", "Songti SC", serif;
+      font-family: var(--font-body);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 58% 28%, rgba(255, 193, 220, 0.95) 0 2rem, rgba(142, 124, 255, 0.42) 2.2rem 8rem, transparent 18rem),
+        radial-gradient(ellipse at 54% 36%, rgba(37, 90, 255, 0.58), transparent 26rem),
+        radial-gradient(ellipse at 42% 42%, rgba(29, 92, 255, 0.55), transparent 23rem),
+        radial-gradient(circle at 72% 58%, rgba(46, 129, 255, 0.45) 0 1.3rem, transparent 4.4rem),
+        linear-gradient(135deg, #02040d 0%, #061231 48%, #02040d 100%);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.95) 0 1px, transparent 1.5px),
+        radial-gradient(circle, rgba(169,196,255,.75) 0 1px, transparent 1.5px),
+        radial-gradient(circle, rgba(255,255,255,.50) 0 1px, transparent 1.5px);
+      background-size: 61px 61px, 97px 97px, 151px 151px;
+      background-position: 2px 9px, 24px 17px, 48px 31px;
+      animation: drift 26s linear infinite;
+    }
+
+    body::after {
+      opacity: .42;
+      filter: blur(.4px);
+      animation-duration: 45s;
+      animation-direction: reverse;
+    }
+
+    @keyframes drift {
+      from { transform: translateY(0); }
+      to { transform: translateY(-120px); }
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 52px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 390px;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      background: linear-gradient(145deg, rgba(10, 23, 58, .82), rgba(6, 10, 30, .72));
+      box-shadow: 0 30px 110px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter: blur(18px);
+    }
+
+    .intro {
+      padding: clamp(28px, 5vw, 54px);
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .intro::after {
+      content: "";
+      position: absolute;
+      width: 520px;
+      height: 120px;
+      right: -100px;
+      top: 180px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, rgba(29,92,255,.78), rgba(255,193,220,.58), transparent);
+      transform: rotate(-13deg);
+      filter: blur(10px);
+      opacity: .82;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 13px;
+      background: rgba(255,255,255,.05);
+      font-size: 14px;
+      letter-spacing: .04em;
+    }
+
+    h1 {
+      margin: 24px 0 14px;
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: clamp(44px, 8vw, 86px);
+      line-height: .92;
+      letter-spacing: -.055em;
+      max-width: 720px;
+    }
+
+    .gradient {
+      font-family: var(--font-cn);
+      font-weight: 500;
+      letter-spacing: .01em;
+      background: linear-gradient(90deg, #fff, #9fc0ff 45%, var(--rose) 88%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      max-width: 620px;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .input-panel {
+      padding: 26px;
+      display: grid;
+      gap: 18px;
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    input, button {
+      width: 100%;
+      border: 0;
+      border-radius: 18px;
+      padding: 15px 16px;
+      font: inherit;
+    }
+
+    input {
+      color: var(--text);
+      background: rgba(255,255,255,.08);
+      outline: 1px solid rgba(189,208,255,.20);
+    }
+
+    input:focus {
+      outline-color: rgba(255,193,220,.80);
+      box-shadow: 0 0 0 4px rgba(255,193,220,.11);
+    }
+
+    button {
+      cursor: pointer;
+      color: #050816;
+      font-weight: 850;
+      background: linear-gradient(90deg, #ffffff, #a9c5ff 50%, var(--rose));
+      box-shadow: 0 12px 34px rgba(72, 117, 255, .32);
+      transition: transform .16s ease, filter .16s ease;
+    }
+
+    button:hover { transform: translateY(-2px); filter: brightness(1.07); }
+
+    .toggles {
+      display: grid;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      border-radius: 18px;
+      color: var(--text);
+      background: rgba(255,255,255,.055);
+      border: 1px solid rgba(189,208,255,.16);
+    }
+
+    .toggle input {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--rose);
+      box-shadow: none;
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .card {
+      min-height: 210px;
+      padding: 22px;
+      border-radius: 26px;
+      border: 1px solid var(--line);
+      background: rgba(6, 13, 34, .72);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      transform: translateY(24px) scale(.97);
+      opacity: 0;
+      filter: blur(8px);
+      animation: reveal-card .62s cubic-bezier(.2, .85, .2, 1) forwards;
+      animation-delay: var(--delay, 0ms);
+    }
+
+    @keyframes reveal-card {
+      55% { opacity: 1; }
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        filter: blur(0);
+      }
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+    }
+
+    .symbol {
+      font-size: 50px;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    .name {
+      font-family: var(--font-cn);
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: .015em;
+      margin-bottom: 10px;
+    }
+
+    .detail {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .empty {
+      margin-top: 24px;
+      padding: 22px;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed rgba(189,208,255,.28);
+      border-radius: 24px;
+      background: rgba(255,255,255,.04);
+    }
+
+    .note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 900px) {
+      .hero, .results { grid-template-columns: 1fr; }
+      .intro { min-height: 380px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <main class="panel intro">
+        <div>
+          <div class="eyebrow">✦ birthday constellation reader</div>
+          <h1>Find your <span class="gradient">星座 · 五行 · 生肖</span></h1>
+          <p class="subtitle">
+            Enter your name and birthday. Choose which readings you want to reveal,
+            then generate a small star-map profile with a galaxy-blue and rose-light theme.
+          </p>
+        </div>
+        <p class="note">
+          五行 is calculated from the birth year’s Heavenly Stem element. Chinese zodiac here uses the common Gregorian birth-year method, so it may differ around Lunar New Year.
+        </p>
+      </main>
+
+      <aside class="panel input-panel">
+        <label>
+          Your name
+          <input id="name" autocomplete="name" placeholder="e.g. Yutong" />
+        </label>
+
+        <label>
+          Birthday
+          <input id="birthday" type="date" />
+        </label>
+
+        <div class="toggles" aria-label="Choose readings">
+          <label class="toggle">
+            <span>Reveal 星座 / Western zodiac</span>
+            <input id="showZodiac" type="checkbox" checked />
+          </label>
+          <label class="toggle">
+            <span>Reveal 五行 / Five elements</span>
+            <input id="showElement" type="checkbox" checked />
+          </label>
+          <label class="toggle">
+            <span>Reveal 生肖 / Chinese zodiac</span>
+            <input id="showChinese" type="checkbox" checked />
+          </label>
+        </div>
+
+        <button id="calculate">Read my stars</button>
+        <p class="note" id="status">Waiting for your birthday.</p>
+      </aside>
+    </section>
+
+    <section id="results" class="results" aria-live="polite"></section>
+  </div>
+
+  <script>
+    const westernZodiac = [
+      { name: "Capricorn 摩羯座", symbol: "♑", start: [12, 22], end: [1, 19], detail: "Grounded, ambitious, and patient. You build slowly, but you build things that last." },
+      { name: "Aquarius 水瓶座", symbol: "♒", start: [1, 20], end: [2, 18], detail: "Original, future-minded, and independent. You often notice possibilities before others do." },
+      { name: "Pisces 双鱼座", symbol: "♓", start: [2, 19], end: [3, 20], detail: "Intuitive, imaginative, and emotionally perceptive. You read atmospheres well." },
+      { name: "Aries 白羊座", symbol: "♈", start: [3, 21], end: [4, 19], detail: "Direct, brave, and energetic. You move first and figure things out in motion." },
+      { name: "Taurus 金牛座", symbol: "♉", start: [4, 20], end: [5, 20], detail: "Steady, sensual, and loyal. You value beauty, comfort, and reliability." },
+      { name: "Gemini 双子座", symbol: "♊", start: [5, 21], end: [6, 20], detail: "Curious, quick, and communicative. Your mind likes windows open in every direction." },
+      { name: "Cancer 巨蟹座", symbol: "♋", start: [6, 21], end: [7, 22], detail: "Protective, sensitive, and memory-rich. You care deeply about emotional safety." },
+      { name: "Leo 狮子座", symbol: "♌", start: [7, 23], end: [8, 22], detail: "Warm, expressive, and generous. You bring theatre and heart into ordinary rooms." },
+      { name: "Virgo 处女座", symbol: "♍", start: [8, 23], end: [9, 22], detail: "Precise, observant, and helpful. You improve things by noticing what others miss." },
+      { name: "Libra 天秤座", symbol: "♎", start: [9, 23], end: [10, 22], detail: "Graceful, relational, and balance-seeking. You are sensitive to harmony and design." },
+      { name: "Scorpio 天蝎座", symbol: "♏", start: [10, 23], end: [11, 21], detail: "Intense, private, and transformative. You prefer truth with depth, not decoration." },
+      { name: "Sagittarius 射手座", symbol: "♐", start: [11, 22], end: [12, 21], detail: "Expansive, adventurous, and philosophical. You need meaning, movement, and horizon." }
+    ];
+
+    const animals = [
+      { name: "Rat 鼠", symbol: "🐀", detail: "Clever, adaptable, and observant." },
+      { name: "Ox 牛", symbol: "🐂", detail: "Steady, persistent, and dependable." },
+      { name: "Tiger 虎", symbol: "🐅", detail: "Bold, magnetic, and fiercely alive." },
+      { name: "Rabbit 兔", symbol: "🐇", detail: "Gentle, tasteful, and quietly strategic." },
+      { name: "Dragon 龙", symbol: "🐉", detail: "Powerful, vivid, and naturally commanding." },
+      { name: "Snake 蛇", symbol: "🐍", detail: "Wise, intuitive, and elegant under pressure." },
+      { name: "Horse 马", symbol: "🐎", detail: "Free-moving, energetic, and independent." },
+      { name: "Goat 羊", symbol: "🐐", detail: "Creative, tender, and aesthetically sensitive." },
+      { name: "Monkey 猴", symbol: "🐒", detail: "Inventive, playful, and mentally agile." },
+      { name: "Rooster 鸡", symbol: "🐓", detail: "Sharp, precise, and proudly expressive." },
+      { name: "Dog 狗", symbol: "🐕", detail: "Loyal, principled, and protective." },
+      { name: "Pig 猪", symbol: "🐖", detail: "Generous, sincere, and pleasure-loving." }
+    ];
+
+    const elementsByStem = [
+      { name: "Metal 金", symbol: "⚔️", detail: "Structured, clear, disciplined, and decisive." },
+      { name: "Metal 金", symbol: "⚔️", detail: "Structured, clear, disciplined, and decisive." },
+      { name: "Water 水", symbol: "🌊", detail: "Adaptive, reflective, perceptive, and flowing." },
+      { name: "Water 水", symbol: "🌊", detail: "Adaptive, reflective, perceptive, and flowing." },
+      { name: "Wood 木", symbol: "🌿", detail: "Growing, generous, creative, and future-oriented." },
+      { name: "Wood 木", symbol: "🌿", detail: "Growing, generous, creative, and future-oriented." },
+      { name: "Fire 火", symbol: "🔥", detail: "Bright, expressive, passionate, and energizing." },
+      { name: "Fire 火", symbol: "🔥", detail: "Bright, expressive, passionate, and energizing." },
+      { name: "Earth 土", symbol: "⛰️", detail: "Grounded, nourishing, stable, and practical." },
+      { name: "Earth 土", symbol: "⛰️", detail: "Grounded, nourishing, stable, and practical." }
+    ];
+
+    const nameInput = document.querySelector("#name");
+    const birthdayInput = document.querySelector("#birthday");
+    const results = document.querySelector("#results");
+    const status = document.querySelector("#status");
+    const calculate = document.querySelector("#calculate");
+
+    function dateInRange(month, day, start, end) {
+      const value = month * 100 + day;
+      const startValue = start[0] * 100 + start[1];
+      const endValue = end[0] * 100 + end[1];
+      if (startValue <= endValue) return value >= startValue && value <= endValue;
+      return value >= startValue || value <= endValue;
+    }
+
+    function getWesternZodiac(month, day) {
+      return westernZodiac.find(sign => dateInRange(month, day, sign.start, sign.end));
+    }
+
+    function getChineseZodiac(year) {
+      const index = ((year - 1900) % 12 + 12) % 12;
+      return animals[index];
+    }
+
+    function getFiveElement(year) {
+      const index = ((year - 1900) % 10 + 10) % 10;
+      return elementsByStem[index];
+    }
+
+    function card(title, reading, index) {
+      const article = document.createElement("article");
+      article.className = "card";
+      article.style.setProperty("--delay", `${index * 360}ms`);
+      article.innerHTML = `
+        <h2>${title}</h2>
+        <div class="symbol">${reading.symbol}</div>
+        <div class="name">${reading.name}</div>
+        <div class="detail">${reading.detail}</div>
+      `;
+      return article;
+    }
+
+    function render() {
+      const birthday = birthdayInput.value;
+      const person = nameInput.value.trim() || "stargazer";
+      results.innerHTML = "";
+
+      if (!birthday) {
+        status.textContent = "Choose your birthday first.";
+        results.innerHTML = `<div class="empty">Your readings will appear here after you enter a birthday.</div>`;
+        return;
+      }
+
+      const [yearText, monthText, dayText] = birthday.split("-");
+      const year = Number(yearText);
+      const month = Number(monthText);
+      const day = Number(dayText);
+
+      const selected = [];
+      if (document.querySelector("#showZodiac").checked) selected.push(["星座 / Western zodiac", getWesternZodiac(month, day)]);
+      if (document.querySelector("#showElement").checked) selected.push(["五行 / Five element", getFiveElement(year)]);
+      if (document.querySelector("#showChinese").checked) selected.push(["生肖 / Chinese zodiac", getChineseZodiac(year)]);
+
+      if (selected.length === 0) {
+        status.textContent = `${person}, choose at least one reading to reveal.`;
+        results.innerHTML = `<div class="empty">Nothing selected yet. Turn on one of the reveal switches.</div>`;
+        return;
+      }
+
+      selected.forEach(([title, reading], index) => results.append(card(title, reading, index)));
+      status.textContent = `${person}, your star-map is ready.`;
+    }
+
+    calculate.addEventListener("click", render);
+    document.querySelectorAll("input").forEach(input => input.addEventListener("change", () => {
+      if (birthdayInput.value) render();
+    }));
+
+    results.innerHTML = `<div class="empty">Enter your details, choose what to reveal, then read your stars.</div>`;
+  </script>
+</body>
+</html>
